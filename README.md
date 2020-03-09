@@ -1,2 +1,2 @@
 # tidytides
-R package to read and process tidal data from the Portuguese National Institute
+R package to read and process tidal data from the Portuguese National Hydrographic Institute
