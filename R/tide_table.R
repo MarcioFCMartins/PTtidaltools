@@ -39,7 +39,7 @@ tide_table <- function(
     names(table) <- c("date_time", "height", "phenomenon")
     
     # Remove moon events
-    if(!moons) table <- table[-grep("-", table$height), ]
+    if(!include_moons) table <- table[-grep("-", table$height), ]
     
     # Clean-up heights and convert to numeric
     table$height <- as.numeric(gsub(" m", "", table$height))
