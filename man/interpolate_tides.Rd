@@ -2,17 +2,21 @@
 % Please edit documentation in R/interpolate_tides.R
 \name{interpolate_tides}
 \alias{interpolate_tides}
-\title{Takes a vector of date times and returns the expected tide for a port}
+\title{Calculate estimated tide heights}
 \usage{
-interpolate_tides(date_time = NULL, port_id = NULL)
+interpolate_tides(date_times = NULL, port_id = 19)
 }
 \arguments{
-\item{port_id}{The id code for the desired port (use valid_ports to see a list)}
+\item{date_times}{A character or date vector with the format yyyy-mm-dd hh:mm:ss}
 
-\item{date}{The starting date for the wanted tides. Format should be yyyy-mm-dd or yyyy/mm/dd}
-
-\item{day_range}{The number of days after date for which to retrieve information}
+\item{port_id}{The id code for the desired port (use valid_ports to see a list, Faro-Olhão is the default)}
 }
 \description{
-This function retrieves the tides for the desired dates and time range
+This function takes a date time vector and calculates expected tide height at those times
+based on the method provided by the Portuguese National Hydrographic Institute
+}
+\examples{
+Retrieve the information for the Faro - OlhÃ£o port, for the 7 days after March 5th of 2020
+sampling_times <- c("2020-03-13 15:15:00", "2020-03-09 16:15:00")
+interpolate_tides(date_times = sampling_times, port_id = 19)
 }

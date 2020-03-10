@@ -20,7 +20,7 @@ get_tides <- function(
     # Format date for query
     date <- ifelse(
         is.null(date),
-        Sys.Date(),
+        as.character(Sys.Date()),
         gsub("-|/", "",as.character(date)))
     
     # Format range for query
@@ -39,11 +39,15 @@ get_tides <- function(
     names(table) <- c("date_time", "height", "phenomenon")
     
     # Remove moon events
-    if(!include_moons) table <- table[-grep("-", table$height), ]
+    if(!include_moons) {
+        table <- table[grep("-", table$height, invert = TRUE), ]
+    }
     
     # Clean-up heights and convert to numeric
     table$height <- as.numeric(gsub(" m", "", table$height))
     
+    # Add seconds to the date time, to ease date conversions
+    table$date_time <- paste0(table$date_time, ":00")
     
     return(table)
 }
