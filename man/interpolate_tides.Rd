@@ -16,7 +16,7 @@ This function takes a date time vector and calculates expected tide height at th
 based on the method provided by the Portuguese National Hydrographic Institute
 }
 \examples{
-Retrieve the information for the Faro - OlhÃ£o port, for the 7 days after March 5th of 2020
+Retrieve the information for the Faro - Olhao port, for the 7 days after March 5th of 2020
 sampling_times <- c("2020-03-13 15:15:00", "2020-03-09 16:15:00")
 interpolate_tides(date_times = sampling_times, port_id = 19)
 }

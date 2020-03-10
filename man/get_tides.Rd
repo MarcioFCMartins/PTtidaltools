@@ -18,8 +18,7 @@ get_tides(port_id = 19, date = NULL, day_range = NULL, include_moons = FALSE)
 \item{include_moons}{Should lunar events be kept in the table? TRUE or FALSE}
 }
 \description{
-This function retrieves the tides for the desired dates and time range.
-By default, data for the Faro - Olhão port, for the current day, is retrieved.
+This function retrieves the tides for the desired dates and time range. By default, data for the Faro - Olhão port, for the current day, is retrieved.
 
 This function retrieves the tides for the desired dates and time range.
 By default, data for the Faro - Olhão port, for the current day, is retrieved.
