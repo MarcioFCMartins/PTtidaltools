@@ -1,14 +1,16 @@
-Package: mypackage
-Title: What the Package Does (One Line, Title Case)
+Package: tidytides
+Title: Obtain Tidal Tables from the Portuguese National Hydrographic Institute
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Márcio",
+           family = "Martins",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "marciomartinsred@gmail.com",
+           comment = c(ORCID = "0000-0002-6969-2215"))
+Description: This package acts as an API to obtain the tidal heights, as given by the Portuguese National Hydrographic Institute.
 License: What license it uses
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2
+Imports: 
+    rvest

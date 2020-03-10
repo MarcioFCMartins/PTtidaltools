@@ -4,7 +4,7 @@
 #' @export
 
 # The National Hidrographic Institute homepage link:
-homepage <- "https://www.hidrografico.pt"
+# "https://www.hidrografico.pt"
 
 # The tide information is obtained by selecting a port, a starting date 
 # and the number of days to display. This information is then sent in a 
