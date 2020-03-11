@@ -66,10 +66,14 @@ interpolate_tides <- function(date_times = NULL, port_id = 19){
     # parameters_df will hold the parameters organized in such a way
     # that applying the interpolation formula is trivial
     # the parameters depend on wether the last event was a low or high tide
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # BREAKS FOR NON-CONTINUOUS INTERVALS
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
     parameters_df <- data.frame()
     
     for(i in 1:length(date_times)){
         sample_time <- date_times[i]
+        
         
         previous_event <- tides_final[tides_final$end < date_times[i],]
         previous_event <- previous_event[which.max(previous_event$date_time),]
