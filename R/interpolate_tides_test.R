@@ -17,7 +17,7 @@ interpolate_tides <- function(date_times = NULL, port_id = 19){
     # This function uses 'lubridate' to ease the date handling,
     # but I kept it to a minimum
     if(is.factor(date_times)) date_times <- as.character(date_times)
-    date_times <- as.POSIXct(date_times, tz = "GMT")[order(date_times)]
+    date_times <- as.POSIXct(date_times, tz = "GMT")
     
     # Get list of unique days required
     days <- unique(format(date_times, "%Y-%m-%d"))
@@ -74,7 +74,6 @@ interpolate_tides <- function(date_times = NULL, port_id = 19){
     for(i in 1:length(date_times)){
         sample_time <- date_times[i]
         
-        
         previous_event <- tides_final[tides_final$end < sample_time,]
         previous_event <- previous_event[which.max(previous_event$date_time),]
         
@@ -99,15 +98,18 @@ interpolate_tides <- function(date_times = NULL, port_id = 19){
                                          "hours"))
         }
         # Append the parameters of one point to parameters for all points
+        parameters <- cbind(previous_event, parameters)
+        parameters$sample_time <- sample_time
         parameters_df <- rbind(parameters_df, parameters)
     }
     
     
-    tide_heights <- with(
+   tidal_heights <- with(
         parameters_df,
         ifelse(last_event == "high",
                (H + h)/2 + (H - h)/2 * cos((pi*t)/T1),
                (h + H)/2 + (h - H)/2 * cos((pi*t)/T1)))
     
-    return(tide_heights)
+    
+    return(tidal_heights)
 }
