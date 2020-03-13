@@ -1,7 +1,6 @@
 # tidytides
 R package to read and process tidal data from the Portuguese National Hydrographic Institute
 
-to-do: 
-  fix interpolation when non-consecutive days are given to interpolate_tides
-  improve documentation, make the difference between valid_ports and get_port_ids clear (change names too, probably)
-  
+Allows you to obtain tidal tables for requested days. You can also pass a vector of date-time data to request the estimated tidal height at that time in a certain harbor.
+
+TODO: add examples in README 
