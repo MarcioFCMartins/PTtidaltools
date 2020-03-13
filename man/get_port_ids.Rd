@@ -8,4 +8,5 @@ get_port_ids()
 }
 \description{
 Queries potential port ID's from the Portuguese National Hydrographic Institute and returns a data.frame with valid ones
+This is a brute force method. Only use this function if the ids provided by port_list are no longer working
 }

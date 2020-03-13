@@ -3,4 +3,4 @@
 export(get_port_ids)
 export(get_tides)
 export(interpolate_tides)
-export(valid_ports)
+export(port_list)

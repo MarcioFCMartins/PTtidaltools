@@ -1,13 +1,16 @@
-#' Show valid ports
+#' Show list of port ids
 #'
-#' Returns a data.frame with the port ID's required to retrieve tide_tables
-#' This is a brute force method, querying the server for 1000 possible id numbers. 
-#' While 1000 queries are not a crazy ammount, I advise you to minimize the use of this function.
+#' Returns a data.frame with the port ID's used in get_tides
+#' Based on data scrapped on 2020/03/13
+#' If port_id is not working, use get_port_ids to generate an updated list
+#'
+#' 
 #' @examples
-#' valid_ports()
+#' port_list()
+#' 
 #' @export
 
-valid_ports <- function(){
+port_list <- function(){
     return(
         structure(list(port_id = c(12L, 13L, 15L, 16L, 18L, 19L, 20L, 
 21L, 28L, 29L, 43L, 73L, 74L, 112L, 211L, 221L, 231L, 243L, 245L, 
