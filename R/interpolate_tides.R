@@ -4,7 +4,7 @@
 #' based on the method provided by the Portuguese National Hydrographic Institute
 #' 
 #' @param date_times A character or date vector with the format yyyy-mm-dd hh:mm:ss
-#' @param port_id The id code for the desired port (use valid_ports to see a list, Faro-Olhão is the default)
+#' @param port_id The id code for the desired port (use port_list to see a list, Faro-Olhão is the default)
 #' 
 #' @examples
 #' Retrieve the information for the Faro - Olhao port, for the 7 days after March 5th of 2020
