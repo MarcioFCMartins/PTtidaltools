@@ -20,6 +20,6 @@ This function retrieves the tides for the desired dates and time range. By defau
 }
 \examples{
 Retrieve the information for the Faro - Olhao port, for 7 days starting at March 5th of 2020
-tide_table(port_id = 19, date = "2020-03-05", day_rage = 7)
+tides_table <- get_tides(port_id = 19, date = "2020-03-05", day_range = 7)
 
 }

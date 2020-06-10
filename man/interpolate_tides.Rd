@@ -9,7 +9,7 @@ interpolate_tides(date_times = NULL, port_id = 19)
 \arguments{
 \item{date_times}{A character or date vector with the format yyyy-mm-dd hh:mm:ss}
 
-\item{port_id}{The id code for the desired port (use valid_ports to see a list, Faro-Olhão is the default)}
+\item{port_id}{The id code for the desired port (use port_list to see a list, Faro-Olhão is the default)}
 }
 \description{
 This function takes a date time vector and calculates expected tide height at those times
