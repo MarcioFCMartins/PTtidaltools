@@ -4,7 +4,6 @@
 #' This is a brute force method. Only use this function if the ids provided by port_list are no longer working
 #'  
 #' @export
-
 # The National Hidrographic Institute homepage link:
 # "https://www.hidrografico.pt"
 
@@ -31,8 +30,8 @@ get_port_ids <- function() {
       port_id
     )
     # Get the port notes for that id
-    port_notes <- read_html(link) %>%
-      html_text()
+    port_notes <- rvest::read_html(link) %>%
+      rvest::html_text()
 
     # Check if the id is valid. If not, skip this id
     if (grepl("^Avisos para este porto", port_notes)) {

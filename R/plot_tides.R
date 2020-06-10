@@ -9,7 +9,8 @@
 #' 
 #' 
 #' @export
-
+#' @import lubridate
+#' @import ggplot2
 plot_tides <- function(tides){
     ggplot(data = tides) +
     geom_point(
