@@ -1,9 +1,10 @@
 #' Calculate estimated tide heights
 #'
-#' This function takes a date time vector and calculates expected tide height at those times
+#' This function takes a series of time-points and a port ID.
+#' It returns the expected tide height at those time-points, for that port
 #' based on the method provided by the Portuguese National Hydrographic Institute
 #' 
-#' @param date_times A character or date vector with the format yyyy-mm-dd hh:mm:ss
+#' @param date_times A character vector with the format yyyy-mm-dd hh:mm:ss OR a POSIXct vector
 #' @param port_id The id code for the desired port (use port_list to see a list, Faro-Olhão is the default)
 #' 
 #' @examples
@@ -13,31 +14,39 @@
 #' @export
 
 interpolate_tides <- function(date_times = NULL, port_id = 19){
+    message(
+        paste0(
+            "Interpolating based on tides reported for port ID ",
+            port_id,
+            " (", port_list()$port_name[port_list()$port_id == 19],
+            ")")
+        
+    )
     # Convert dates to POSIXct and arrange in ascending order
     # This function uses 'lubridate' to ease the date handling,
     # but I kept it to a minimum
     if(is.factor(date_times)) date_times <- as.character(date_times)
-    date_times <- as.POSIXct(date_times, tz = "GMT")
+    if(is.character(date_times)) date_times <- as.POSIXct(date_times, tz = "GMT")
     
-    # Get list of unique days required
-    days <- unique(format(date_times, "%Y-%m-%d"))
+    # Get list of unique days for which tidal table is required
+    days <- as.POSIXct(unique(format(date_times, "%Y-%m-%d")), tz = "GMT")
     
-    # Create a new vector with all supplied dates, and all days before / after
+    # Add the days before/after - for when tidal events are across days
     all_days <- integer()
     class(all_days) <- "POSIXct"
     for(i in 1:length(days)){
-        current_day <- as.POSIXct(days[i], tz = "GMT")
-        interval <- c(current_day - lubridate::period(1, "day"),
+        current_day <- days[i]
+        interval <- c(current_day - 86400,
                       current_day,
-                      current_day + lubridate::period(1, "day"))
+                      current_day + 86400)
         
         all_days <- c(all_days, interval)
     }
     
-    # Ensure we don't keep duplicate dates
+    # Remove duplicate days
     all_days <- unique(all_days)
     
-    # Get tidal data for all required days
+    # Get tidal data 
     tides <- lapply(
         as.character(all_days),
         function(x) get_tides(port_id = port_id, date = x, day_range = 0))
@@ -45,29 +54,33 @@ interpolate_tides <- function(date_times = NULL, port_id = 19){
     tides <- do.call(rbind, tides)
     
     tides$date_time <- as.POSIXct(tides$date_time)
-    # Format tide table to use in interpolation by adding start and end times
-    tides$end <- as.POSIXct(tides$date_time)
     
-    # Remove first row to prevent issues with lagging the times (NAs)
+    # Format tide table to use in interpolation:
+    # Add a start and end of tidal event (current event = row being processed)
+    #   - time reported in tidal table of current event is the end time
+    #   - end time of last event is the start of current event
+
+    # Remove first row to prevent issues with leading values
     tides_final <- tides[-1,]
     
-    # This lagged observation approach only works because we already added 
-    # extra days around the desired ones, for safety. 
+    # Adds the current time observations as the end times
+    tides_final$end <- as.POSIXct(tides_final$date_time)
+    # Adds the leading observations as the start times
     tides_final$start <- tides$date_time[-nrow(tides)]
     
-    
     tides_final$duration <- as.numeric(
-        lubridate::as.duration(
-            lubridate::as.interval(tides_final$start, tides_final$end)
-        ),
-        "hours"
+        difftime( 
+            tides_final$end,
+            tides_final$start,
+            units = c("hours"))
     )
     
+    # BEGIN THE INTERPOLATION:
     # parameters_df will hold the parameters organized in such a way
     # that applying the interpolation formula is trivial
-    # the parameters depend on wether the last event was a low or high tide
+    # the parameters change based on whether the last event was a low or high tide
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # BREAKS FOR NON-CONTINUOUS INTERVALS
+    # TO-DO: CURRENTLY BREAKS IF TIME INTERVALS ARE NOT CONTINUOUS
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
     parameters_df <- data.frame()
     

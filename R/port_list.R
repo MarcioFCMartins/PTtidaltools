@@ -16,7 +16,7 @@ port_list <- function(){
 21L, 28L, 29L, 43L, 73L, 74L, 112L, 211L, 221L, 231L, 243L, 245L, 
 311L, 312L, 335L, 411L, 412L, 413L, 511L, 521L, 611L, 612L, 613L, 
 614L, 711L, 712L, 713L, 714L, 715L, 716L, 717L, 718L, 719L, 721L, 
-727L, 814L), port_name = structure(1:43, .Label = c("Leixões", 
+727L, 814L), port_name = structure(c("Leixões", 
 "Aveiro - Molhe Central", "Cascais", "Lisboa", "Lagos", "Faro - Olhão", 
 "Setúbal - Tróia", "Vila Real de Santo António", "Sesimbra", 
 "Peniche", "Sines", "Figueira da Foz", "Viana do Castelo", "Funchal", 
@@ -25,7 +25,7 @@ port_list <- function(){
 "Ilheu do Caió", "Porto de Bubaque", "Baía de Ana Chaves", "Baía de St. António", 
 "Soyo", "Luanda", "Lobito", "Namibe", "Maputo", "Inhambane", 
 "Beira", "Chinde", "Quelimane", "Pebane", "Angoche", "Ilha de Moçambique", 
-"Pemba", "Mocimboa da Praia", "Nacala", "Porto de Macau"), class = "factor")), row.names = c(NA, 
+"Pemba", "Mocimboa da Praia", "Nacala", "Porto de Macau"), class = "character")), row.names = c(NA, 
 -43L), class = "data.frame")
     )
 }

@@ -1,5 +1,5 @@
 Package: tidytides
-Title: Obtain Tidal Tables from the Portuguese National Hydrographic Institute
+Title: Operations on tidal tables from the Portuguese National Hydrographic Institute
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Márcio",
@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "marciomartinsred@gmail.com",
            comment = c(ORCID = "0000-0002-6969-2215"))
-Description: This package acts as an API to obtain the tidal heights, as given by the Portuguese National Hydrographic Institute.
+Description: This package acts as an API to obtain tidal tables from the Portuguese National Hydrographic Institute and perform interpolation between tidal events.
 License: What license it uses
 Encoding: UTF-8
 LazyData: true
@@ -15,5 +15,4 @@ RoxygenNote: 7.1.0
 Imports: 
     rvest,
     xml2,
-    lubridate,
     ggplot2
