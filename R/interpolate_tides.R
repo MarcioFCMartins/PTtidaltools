@@ -25,8 +25,15 @@ interpolate_tides <- function(date_times = NULL, port_id = 19){
     # Convert dates to POSIXct and arrange in ascending order
     # This function uses 'lubridate' to ease the date handling,
     # but I kept it to a minimum
-    if(is.factor(date_times)) date_times <- as.character(date_times)
-    if(is.character(date_times)) date_times <- as.POSIXct(date_times, tz = "GMT")
+    if(is.factor(date_times)){ 
+        date_times <- as.character(date_times)
+    }
+    
+    if(is.character(date_times)){
+        date_times <- as.POSIXct(date_times,
+                                 format = "%Y-%m-%d %H:%M:%S",
+                                 tz = "GMT")
+    }
     
     # Get list of unique days for which tidal table is required
     days <- as.POSIXct(unique(format(date_times, "%Y-%m-%d")), tz = "GMT")
