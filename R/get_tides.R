@@ -2,10 +2,10 @@
 #'
 #' This function retrieves the tides for the desired dates and time range. By default, data for the Faro - Olhao port, for the current day, is retrieved.
 #' 
-#' @param port_id The id code for the desired port. Use valid_ports to see a list of ids.
-#' @param date The starting date for the wanted tides. Format should be yyyy-mm-dd or yyyy/mm/dd
+#' @param port_id  The id code for the desired port. Use `port_list()` to see a list of IDs. Defaults to Faro-Olhão.
+#' @param date  The starting date for the wanted tides. Format should be yyyy-mm-dd or yyyy/mm/dd. Defaults to current date
 #' @param day_range The number of days after date for which to retrieve information
-#' @param include_moons Should lunar events be kept in the table? TRUE or FALSE
+#' @param include_moons Should lunar events be kept in the table? Defaults to FALSE
 #' 
 #' @examples
 #' Retrieve the information for the Faro - Olhao port, for 7 days starting at March 5th of 2020

@@ -1,0 +1,81 @@
+---
+title: "tidytides"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidytides)
+```
+
+## Goal
+
+This is an R package to read and process tidal data from the Portuguese National Hydrographic Institute.
+
+With it, you can retrieve tidal tables programmatically, estimate tidal height at desired points in time and create simple calendar plots of tidal events to help you plan field work.
+
+Initially, this package was built as a quick-fix for some work I had to do, and was more of a personal tool than a public one. As such, assumption checks, error handling and error reporting are not very sophisticated (although this might be more attributed to my ignorance on these subjects). 
+
+If you use this tool, make sure you read how data should be passed into the arguments. The package has standard R formatted documentation, meaning you can always use the `?` operator to see the help for a function. 
+
+
+## Functionality
+
+### 1. See port IDs
+
+To retrieve a tidal table, you must specify what port you want. This package includes 2 ways to do that: 
+
+#### *port_list* 
+
+Returns a pre-compiled data.frame with available ports. These ids were retrieved in February 2020, if you are getting errors with the IDs in this table, see *get_port_list*.
+
+**usage:** 
+
+port_list()
+
+
+#### *get_port_list*
+
+**DO NOT USE UNLESS THE IDS FROM port_list() FAIL** Brute forces a test for all IDs from 0 to 1000 and returns all valid ones. While I doubt that this would actually put any significant load on the servers, brute force methods are a little rude so this function is only a back up in case the pre-compiled IDs fail. It also takes some time to run so it's not as convenient.
+
+**usage:** 
+
+get_port_list()
+
+### 2. Retrieve a tidal table
+
+#### *get_tides*
+
+Returns a data.frame with all tidal events for a time period.
+
+port_id - Integer - The id code for the desired port. Use `port_list()` to see a list of IDs. Defaults to Faro-Olhão.
+date - Character or POSIXct - The starting date for the wanted tides. Format should be yyyy-mm-dd or yyyy/mm/dd. Defaults to current date
+day_range - Integer - The number of days after date for which to retrieve information
+include_moons - Logical - Should lunar events be kept in the table? Defaults to FALSE
+
+**usage:** 
+
+```{r get_tides}
+table <- get_tides(port_id = 19, date = "2020-03-05", day_range = 7, include_moons = FALSE)
+
+table
+```
+
+### 
+#### *interpolate_tides*
+
+**usage** sampling_times <- c("2020-03-13 15:15:00", "2020-03-09 16:15:00")
+interpolate_tides(date_times = sampling_times, port_id = 19)
+
+
+
+Returns a vector with estimated tidal height, at the time points supplied in date_times.
+date_times A character vector with the format yyyy-mm-dd hh:mm:ss or POSIXct vector
+port_id The id code for the desired port (use port_list to see a list, Faro-Olhão is the default)
+
+#### *plot_tides*
+
+**usage:** plot(tide_table)
+
+Takes a table returned by **get_tides** and turns it into a calendar-style plot. Ideal for quickly looking at when tidal events occur over a time period. I recomment adding a geom_vline at times of interest to make interpretation easier and quicker. Used, mostly, to plan field work.
