@@ -14,17 +14,16 @@
 #' @export
 
 interpolate_tides <- function(date_times = NULL, port_id = 19){
+    
     message(
         paste0(
             "Interpolating based on tides reported for port ID ",
             port_id,
-            " (", port_list()$port_name[port_list()$port_id == 19],
+            " (", port_list()$port_name[port_list()$port_id == port_id],
             ")")
         
     )
-    # Convert dates to POSIXct and arrange in ascending order
-    # This function uses 'lubridate' to ease the date handling,
-    # but I kept it to a minimum
+    # Convert dates to POSIXct and arranges them in ascending order
     if(is.factor(date_times)){ 
         date_times <- as.character(date_times)
     }
