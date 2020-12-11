@@ -6,6 +6,7 @@
 #' @param date  The starting date for the wanted tides. Format should be yyyy-mm-dd or yyyy/mm/dd. Defaults to current date
 #' @param day_range The number of days for which to retrieve information. Defaults to 1 which retrieves only the date for the provided date
 #' @param include_moons Should lunar events be kept in the table? Defaults to FALSE
+#' @param silent Should messages be suppressed? Defaults to FALSE (displays messages)
 #' 
 #' @examples
 #' Retrieve the information for the Faro - Olhao port, for 7 days, starting at March 5th of 2020
@@ -17,7 +18,8 @@ get_tides <- function(
     port_id = 19,
     date = Sys.Date(), 
     day_range = 1,
-    include_moons = FALSE) {
+    include_moons = FALSE,
+    silent = FALSE) {
     
     
     # Format date for query - convert to character and remove separators 
@@ -74,16 +76,19 @@ get_tides <- function(
         tz = time_zone,
         format = "%Y-%m-%d %H:%M:%S"
     )
-
-    message(
-        paste0(
-            "Retrieved tidal table for port ID ",
-            port_id,
-            " (", port_list()$port_name[port_list()$port_id == port_id],
-            "). \nTime-zone used is ",
-            time_zone,
-            ".")
-    ) 
+    
+    if(!silent){
+        message(
+            paste0(
+                "Retrieved tidal table for port ID ",
+                port_id,
+                " (", port_list()$port_name[port_list()$port_id == port_id],
+                "). \nTime-zone used is ",
+                time_zone,
+                ".")
+        )
+        message("WARNING: due to sea level rise, observed water heights are\napproximately +10 cm over shown values.")
+    }
         
     return(table)
 }

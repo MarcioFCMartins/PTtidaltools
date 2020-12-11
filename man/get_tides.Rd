@@ -4,22 +4,30 @@
 \alias{get_tides}
 \title{Get tide table for a port and day}
 \usage{
-get_tides(port_id = 19, date = NULL, day_range = NULL, include_moons = FALSE)
+get_tides(
+  port_id = 19,
+  date = Sys.Date(),
+  day_range = 1,
+  include_moons = FALSE,
+  silent = FALSE
+)
 }
 \arguments{
-\item{port_id}{The id code for the desired port. Use valid_ports to see a list of ids.}
+\item{port_id}{The id code for the desired port. Use `port_list()` to see a list of IDs. Defaults to 19, which is Faro-Olhão.}
 
-\item{date}{The starting date for the wanted tides. Format should be yyyy-mm-dd or yyyy/mm/dd}
+\item{date}{The starting date for the wanted tides. Format should be yyyy-mm-dd or yyyy/mm/dd. Defaults to current date}
 
-\item{day_range}{The number of days after date for which to retrieve information}
+\item{day_range}{The number of days for which to retrieve information. Defaults to 1 which retrieves only the date for the provided date}
 
-\item{include_moons}{Should lunar events be kept in the table? TRUE or FALSE}
+\item{include_moons}{Should lunar events be kept in the table? Defaults to FALSE}
+
+\item{silent}{Should messages be suppressed? Defaults to FALSE (displays messages)}
 }
 \description{
-This function retrieves the tides for the desired dates and time range. By default, data for the Faro - Olhao port, for the current day, is retrieved.
+Returns a data.frame with all tidal, for a time period with a specified start date and duration. The returned times are always in the local GMT time for the port (as specified in by the Portuguese National Hydrographic Institute).
 }
 \examples{
-Retrieve the information for the Faro - Olhao port, for 7 days starting at March 5th of 2020
-tides_table <- get_tides(port_id = 19, date = "2020-03-05", day_range = 7)
+Retrieve the information for the Faro - Olhao port, for 7 days, starting at March 5th of 2020
+tides <- get_tides(port_id = 19, date = "2020-03-05", day_range = 6)
 
 }

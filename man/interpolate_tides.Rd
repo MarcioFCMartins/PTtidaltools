@@ -14,7 +14,8 @@ interpolate_tides(date_times = NULL, port_id = 19)
 \description{
 This function takes a series of time-points and a port ID.
 It returns the expected tide height at those time-points, for that port
-based on the method provided by the Portuguese National Hydrographic Institute
+based on the method provided by the Portuguese National Hydrographic Institute.
+IMPORTANT: Currently it assumes that the timezone of the provided time-points is the same as the one for the tidal table. Make sure that assumption is true!
 }
 \examples{
 Retrieve the information for the Faro - Olhao port, for the 7 days after March 5th of 2020
