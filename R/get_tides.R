@@ -3,14 +3,14 @@
 #' Returns a data.frame with all tidal, for a time period with a specified start date and duration. The returned times are always in the local GMT time for the port (as specified in by the Portuguese National Hydrographic Institute).
 #' 
 #' @param port_id  The id code for the desired port. Use `port_list()` to see a list of IDs. Defaults to 19, which is Faro-Olhão.
-#' @param date  The starting date for the wanted tides. Format should be yyyy-mm-dd or yyyy/mm/dd. Defaults to current date
-#' @param day_range The number of days for which to retrieve information. Defaults to 1 which retrieves only the date for the provided date
-#' @param include_moons Should lunar events be kept in the table? Defaults to FALSE
-#' @param silent Should messages be suppressed? Defaults to FALSE (displays messages)
+#' @param date  The starting date for the wanted tides. Format should be yyyy-mm-dd or yyyy/mm/dd. Accepts class character, Date and POSIXct. Defaults to current date.
+#' @param day_range The number of days for which to retrieve information. Defaults to 1 which only provides tides for `date`
+#' @param include_moons Should lunar events be kept in the table? Defaults to FALSE.
+#' @param silent Should messages be suppressed? Defaults to FALSE (displays messages).
 #' 
 #' @examples
 #' Retrieve the information for the Faro - Olhao port, for 7 days, starting at March 5th of 2020
-#' tides <- get_tides(port_id = 19, date = "2020-03-05", day_range = 6)
+#' tides <- get_tides(port_id = 19, date = "2020-03-05", day_range = 7)
 #' 
 #' @export
 
@@ -22,60 +22,123 @@ get_tides <- function(
     silent = FALSE) {
     
     
-    # Format date for query - convert to character and remove separators 
-    # to have yyyymmdd format as required for HTTP request
-    date <- gsub("-|/", "",as.character(date))
-    
     # the HTTP request requires the number of days after the provided date
-    # subtract 1 from provided range
     day_range <- ifelse(
         day_range < 0,
         0,
         day_range - 1
     )
     
-    # Build string that links to the desired query
-    query_link <- paste0(
-        "https://www.hidrografico.pt/json/mare.port.val.php?po=",
-        port_id, "&dd=", date, "&nd=", day_range
-    )
-    
-    # Scrape the tidal table and time zones
-    query_page <- xml2::read_html(query_link)
-    
-    table <- rvest::html_node(query_page, ".table-striped")
-    table <- rvest::html_table(table)
-    
-    time_zone <- rvest::html_text(query_page)
-    time_zone <- regmatches(
-        time_zone, 
-        gregexpr("(?<=\\().*?(?=\\))", time_zone, perl=T))[[1]]
-    time_zone <- sub(
-        "UTC/",
-        "",
-        time_zone
-    )
-    
-    names(table) <- c("date_time", "height", "phenomenon")
-    
-    # Filter moon events
-    if(!include_moons) {
-        table <- table[grep("-", table$height, invert = TRUE), ]
+    # the Hydrographic institute API only reports 2 timezones
+    # when the query starts and ends on different timezones.
+    # this is problematic for queries longer than 6 months
+    # break large queries down into smaller ones
+    if(day_range > 150){
+        start <- as.Date(date)
+        end   <- as.Date(date) + day_range
+        
+        # sequence of dates to query
+        query_dates <- seq.Date(
+            from = start,
+            to   = end,
+            by = 150)
+        
+        # ranges for queries
+        query_ranges <- as.numeric(c(query_dates[-1], end) - query_dates)
+    } else {
+        query_dates <- date
+        query_ranges <- day_range
     }
     
-    # Clean-up heights and convert to numeric
-    table$height <- as.numeric(gsub(" m", "", table$height))
     
-    # Translate tidal events to English 
-    table$phenomenon[table$phenomenon == "Baixa-mar"] <- "low-tide"
-    table$phenomenon[table$phenomenon == "Preia-mar"] <- "high-tide"
+    # Format date for query: yyyymmdd
+    query_dates <- gsub("-|/", "",as.character(query_dates))
     
-    # Convert date_time to POSIXct, with time zone information
-    table$date_time <- as.POSIXct(
-        paste0(table$date_time, ":00"),
-        tz = time_zone,
-        format = "%Y-%m-%d %H:%M:%S"
+ 
+    # Build strings that link to the desired query
+    query_links <- paste0(
+        "https://www.hidrografico.pt/json/mare.port.val.php?po=",
+        port_id, "&dd=", query_dates, "&nd=", query_ranges
     )
+    
+    table_list <- list()
+    
+    for(query_link in query_links){
+        # Scrape the tidal table and time zone
+        query_page <- xml2::read_html(query_link)
+        
+        table <- rvest::html_node(query_page, ".table-striped")
+        table <- rvest::html_table(table)
+        
+        n_cols <- dim(table)[2]
+        
+        # one time zone
+        if(n_cols == 3){
+            time_zone <- rvest::html_text(query_page)
+            time_zone <- regmatches(
+                time_zone, 
+                gregexpr("(?<=\\().*?(?=\\))", time_zone, perl=T))[[1]]
+            
+            
+            time_zone <- sub("UTC/GMT", "", time_zone)
+            time_zone[time_zone == ""] <- 0
+            
+            
+            
+            table[, "time_delta"] <- as.numeric(time_zone)
+            
+            names(table) <- c("local_date_time", "height", "phenomenon", "time_delta")
+        }
+        
+        
+        # multiple time zones
+        if(n_cols == 4){
+            time_zones <- rvest::html_text(query_page)
+            time_zones <- regmatches(
+                time_zones, 
+                gregexpr("(?<=\\().*?(?=\\))", time_zones, perl=T))[[1]]
+            
+            time_zones <- as.data.frame(matrix(time_zones, ncol = 2, byrow = TRUE))
+            time_zones[,2] <- sub("UTC/GMT", "", time_zones[, 2])
+            time_zones[time_zones == ""] <- 0
+            
+            names(time_zones) <- c("notes", "time_delta")
+            names(table) <- c("local_date_time", "height", "phenomenon", "notes")
+            
+            table <- merge(table, time_zones, by = "notes")
+            
+            table$time_delta <- as.numeric(table$time_delta)
+        }
+        
+        # Filter moon events
+        if(!include_moons) {
+            table <- table[grep("-", table$height, invert = TRUE), ]
+        }
+        
+        # Clean-up heights and convert to numeric
+        table$height <- as.numeric(gsub(" m", "", table$height))
+        
+        # Translate tidal events to English 
+        table$phenomenon[table$phenomenon == "Baixa-mar"] <- "low-tide"
+        table$phenomenon[table$phenomenon == "Preia-mar"] <- "high-tide"
+        
+        # Convert local_date_time to POSIXct, with time zone information
+        table$local_date_time <- as.POSIXct(
+            paste0(table$local_date_time, ":00"),
+            format = "%Y-%m-%d %H:%M:%S"
+        )
+        
+       
+        table$UTC_date_time <- table$local_date_time - (3600 * table$time_delta)
+        
+        table <- table[, c("local_date_time", "UTC_date_time", "height", "phenomenon", "time_delta")]
+        
+        table_list[[query_link]] <- table
+    }
+    
+    final_table <- do.call(
+        function(...) rbind(..., make.row.names = FALSE), 
+        table_list)[, -5]
     
     if(!silent){
         message(
@@ -83,12 +146,11 @@ get_tides <- function(
                 "Retrieved tidal table for port ID ",
                 port_id,
                 " (", port_list()$port_name[port_list()$port_id == port_id],
-                "). \nTime-zone used is ",
-                time_zone,
-                ".")
+                ").")
         )
+        
         message("WARNING: due to sea level rise, observed water heights are\napproximately +10 cm over shown values.")
     }
-        
-    return(table)
+    
+    return(final_table)
 }
