@@ -17,6 +17,8 @@
 
 interpolate_tides <- function(date_times = NULL, port_id = 19){
     
+    stop("This function is currently broken")
+    
     # Convert dates to POSIXct and arranges them in ascending order
     if(is.factor(date_times)){ 
         date_times <- as.character(date_times)
