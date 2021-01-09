@@ -6,7 +6,7 @@
 #' IMPORTANT: Currently it assumes that the timezone of the provided time-points is the same as the one for the tidal table. Make sure that assumption is true!
 #' 
 #' 
-#' @param date_times A character vector with the format yyyy-mm-dd hh:mm:ss OR a POSIXct vector
+#' @param date_times A character vector with the format yyyy-mm-dd hh:mm:ss OR a POSIXct vector of date-time points for which tidal height will be estimated.
 #' @param port_id The id code for the desired port (use port_list to see a list, Faro-Olhão is the default)
 #' 
 #' @examples
