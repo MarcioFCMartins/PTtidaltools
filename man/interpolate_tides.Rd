@@ -4,21 +4,28 @@
 \alias{interpolate_tides}
 \title{Calculate estimated tide heights}
 \usage{
-interpolate_tides(date_times = NULL, port_id = 19)
+interpolate_tides(date_times = NULL, port_id = 19, timezone = "local")
 }
 \arguments{
-\item{date_times}{A character vector with the format yyyy-mm-dd hh:mm:ss OR a POSIXct vector}
+\item{date_times}{A character vector with the format yyyy-mm-dd hh:mm:ss OR a POSIXct vector of date-time points for which tidal height will be estimated.}
 
 \item{port_id}{The id code for the desired port (use port_list to see a list, Faro-Olhão is the default)}
+
+\item{timezone}{The timezone used for `date_times`. Must be one of "local" (which includes time changes due to daylight savings) or "UTC".}
 }
 \description{
-This function takes a series of time-points and a port ID.
+This function interpolates tides at given time points for any port covered by 
+the National Hydrographic Institute.
+}
+\details{
+You must specify the port ID and provide the list of date-time points for which
+tidal height should be estimated.
+
 It returns the expected tide height at those time-points, for that port
 based on the method provided by the Portuguese National Hydrographic Institute.
-IMPORTANT: Currently it assumes that the timezone of the provided time-points is the same as the one for the tidal table. Make sure that assumption is true!
 }
 \examples{
-Retrieve the information for the Faro - Olhao port, for the 7 days after March 5th of 2020
+Retrieve the information for the Faro - Olhao port, for the 7 days after March 5th of 2020.
 sampling_times <- c("2020-03-13 15:15:00", "2020-03-09 16:15:00")
-interpolate_tides(date_times = sampling_times, port_id = 19)
+interpolate_tides(port_id = 19, date_times = sampling_times, timezone = "local")
 }

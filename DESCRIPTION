@@ -1,4 +1,4 @@
-Package: tidal_tools
+Package: tidaltools
 Title: Operations on tidal tables from the Portuguese National Hydrographic Institute
 Version: 0.0.0.9000
 Authors@R: 
