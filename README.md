@@ -1,29 +1,24 @@
-tidytides
+tidal_tools
 ================
 
 ## Goal
 
 This is an R package to read and process tidal data from the Portuguese
-National Hydrographic Institute. With it, you can retrieve tidal tables
-programmatically, estimate tidal height at desired points in time (by
-interpolating the height over time) and create simple calendar plots of
+National Hydrographic Institute. With it, you can programmatically retrieve tidal tables, estimate tidal height at desired points in time (by
+interpolating the height across time) and create simple calendar plots of
 tidal events to help you plan field work.
-
-The functions should all be usable in a tidyverse compatible workflow
-(i.e. piping).
 
 Initially, this package was built as a quick-fix for some work I had to
 do, and was more of a personal tool than a public one. Since then, it
 has evolved a bit but assumption checks, error handling and error
-reporting are not very sophisticated (although this is mostly due to my
-ignorance on these subjects).
+reporting are not very sophisticated.
 
-If you use this tool, make sure you read how data should be passed into
-the arguments. The package has standard R formatted documentation,
+If you use this tool, make sure you read the **documentation**, especially how arguments should be passed into
+the function. The package has standard R formatted documentation,
 meaning you can always use the `?` operator to see the help for a
 function.
 
-## Functionality
+## Functionality - outdated, use the `?` help in R
 
 ### 1\. See port IDs
 
