@@ -29,8 +29,8 @@ help for a function.
 
 ## Installation
 
-You can install the package with
-\`devtools::install\_github(“<https://github.com/MarcioFCMartins/tidal_tools>”)
+Install the `devtools` package. Then you can do
+`devtools::install_github("https://github.com/MarcioFCMartins/tidaltools")`.
 
 ### Select region
 

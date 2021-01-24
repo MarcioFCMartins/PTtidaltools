@@ -31,7 +31,7 @@ This package started a side-project and was meant to be more of a personal tool 
 
 ## Installation
 
-You can install the package with `devtools::install_github("https://github.com/MarcioFCMartins/tidal_tools")
+Install the `devtools` package. Then you can do `devtools::install_github("https://github.com/MarcioFCMartins/tidaltools")`.
 
 ### Select region
 
