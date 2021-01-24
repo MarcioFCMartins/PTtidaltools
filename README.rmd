@@ -1,5 +1,5 @@
 ---
-title: "tidytides"
+title: "Tidaltools R package"
 output: github_document
 ---
 
@@ -15,19 +15,23 @@ This `R` package contains tools to work with the Portuguese National Hydrographi
 
 It has 2 main tasks:
 
-1. Downloading the tidal tables for chosen time periods
+1. Downloading tidal tables for chosen time periods
 2. Estimate tidal height at given time points
 
 
 Task 1 is accomplished via their REST API. 
 
-Task 2 takes the heigts from the tidal tables and interpolates it to the chosen time points by approximating it as a sin-wave ([reference in Portuguese](https://www.hidrografico.pt/recursos/tabmares/2021/TabelaMares_Capitulo1_Generalidades_2021.pdf)).
+Task 2 takes the heights from the tidal tables and interpolates it to the chosen time points by approximating it as a sin-wave ([reference in Portuguese](https://www.hidrografico.pt/recursos/tabmares/2021/TabelaMares_Capitulo1_Generalidades_2021.pdf)).
 
 
 This package started a side-project and was meant to be more of a personal tool than a public one. Since then it has evolved a lot, but assumption checks, error handling and error reporting are still not great. If you use this tool, make sure you read how data should be passed into the arguments. The package has standard R formatted documentation, meaning you can always use the `?` operator to see the help for a function. 
 
 
 ## How to use it?
+
+## Installation
+
+You can install the package with `devtools::install_github("https://github.com/MarcioFCMartins/tidal_tools")
 
 ### Select region
 
