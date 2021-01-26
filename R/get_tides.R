@@ -7,7 +7,7 @@
 #' @param end_date The end date for the tidal table. Same format as start_date
 #' @param day_range OPTIONAL You can skip the end date and just say how many days you are interested in. Defaults to 1 which only provides tides for `start_date`
 #' @param include_moons Should lunar events be kept in the table? Defaults to FALSE.
-#' @param silent Should messages be suppressed? Defaults to FALSE (displays messages).
+#' @param silent Should messages be suppressed? Defaults to FALSE (display messages).
 #' 
 #' @examples
 #' Retrieve the information for the Faro - Olhao port, for 7 days, starting at March 5th of 2020
