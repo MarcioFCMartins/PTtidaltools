@@ -1,16 +1,25 @@
 #' Calculate estimated tide heights
 #'
 #' This function interpolates tides at given time points for any port covered by 
-#' the National Hydrographic Institute.
+#' the National Hydrographic Institute, or for which a tidal table is provided.
 #' 
-#' You must specify the port ID and provide the list of date-time points for which
-#' tidal height should be estimated.
+#' There are 2 main ways to use the function: 
+#' 1) Provide a port ID and the function will query the National Hydrographic Institute
+#' for the required tidal tables. 
 #' 
-#' It returns the expected tide height at those time-points, for that port
+#' 2) Provide your own tidal table. Great if you want to save a table from
+#' `get_tides` and then run the code several times without constantly querying the API, 
+#' share it with other people or use the function without internet access.
+#' You can also use custom tidal tables, but in that case checking the integrity of
+#' the tidal table is mostly up to you.
+#' 
+#' 
+#' Returns the expected tide height at those time-points, for that port
 #' based on the method provided by the Portuguese National Hydrographic Institute.
 #' 
-#' @param port_id The id code for the desired port (use port_list to see a list, Faro-Olhão is the default)
 #' @param date_times A character vector with the format yyyy-mm-dd hh:mm:ss OR a POSIXct vector of date-time points for which tidal height will be estimated.
+#' @param port_id The id code for the desired port (use port_list to see a list, Faro-Olhão is the default)
+#' @param tidal_table OPTIONAL A table with the tidal events and time at which they occur. If provided, the port_id will be ignored
 #' @param timezone The timezone used for `date_times`. Must be one of "local" (which includes time changes due to daylight savings) or "UTC".
 #' 
 #' @examples
@@ -22,17 +31,19 @@
 interpolate_tides <- function(
     date_times = NULL, 
     port_id = 19,
-    timezone = "local"){
+    tides = NULL,
+    timezone = "local",
+    digits = 2) {
     
     # assert that time_zone is correct
     timezone <- tolower(timezone)
     if(!timezone %in% c("local", "utc")){
         stop("Timezone must be either local or utc. Other timezones are not handled.")
-    } else(
+    } else {
         message(paste0("Interpolating all tides assuming ", toupper(timezone), " times."))
-    )
+    }
     
-    # Convert dates to POSIXct and arranges them in ascending order
+    # Convert dates to POSIXct
     if(is.factor(date_times)){ 
         date_times <- as.character(date_times)
     }
@@ -46,9 +57,9 @@ interpolate_tides <- function(
     days <- as.POSIXct(
         unique(format(date_times, "%Y-%m-%d"))
     )
-    
-    
-    # Add the days before/after the provided time points - for when tidal events are across days
+
+    # Add the days before/after the provided time points
+    # for when interpolation must be done on events across different days
     all_days <- NULL
     for(i in 1:length(days)){
         current_day <- days[i]
@@ -66,36 +77,64 @@ interpolate_tides <- function(
     # remove duplicate days
     all_days <- unique(all_days)
     
-    # get tidal data for all days needed for interpolation
-    tides <- lapply(
-        all_days,
-        function(x) get_tides(
-            port_id = port_id, 
-            date = x, 
-            day_range = 0, 
-            silent = TRUE)
-    )
-    
-    tides <- do.call(rbind, tides)
-    
-    # interpolation uses the column called date_time
-    # select which timezone to use for such column 
-    if(timezone == "local"){
-        tides$date_time <- as.POSIXct(tides$local_date_time)
+    # if tidal table is provided
+    if(!is.null(tides)){
+        # select which time column to use for interpolation 
+        if(timezone == "local"){
+            tides$date_time <- as.POSIXct(tides$local_date_time)
+        } else {
+            tides$date_time <- as.POSIXct(tides$UTC_date_time)
+        }
+        
+        # check for presence of required days in tidal table
+        days_in_table <- as.POSIXct(unique(format(tides$date_time, "%Y-%m-%d")))
+        
+        # stop if days are missing
+        if(!all(all_days %in% days_in_table)){
+            stop(
+                paste0(
+                    "The following days are missing in your tidal_table:\n",
+                     paste0(all_days[!all_days %in% days_in_table], collapse = "\n")
+                    )
+            )
+        }
+    # If a tidal table is NOT provided
     } else {
-        tides$date_time <- as.POSIXct(tides$UTC_date_time)
+        # get tidal data from NIH for all days needed for interpolation
+        tides <- lapply(
+            all_days,
+            function(x) get_tides(
+                port_id = port_id, 
+                date = x, 
+                day_range = 0, 
+                silent = TRUE)
+        )
+        
+        tides <- do.call(rbind, tides)
+        
+        # select which time column to use for interpolation 
+        if(timezone == "local"){
+            tides$date_time <- as.POSIXct(tides$local_date_time)
+        } else {
+            tides$date_time <- as.POSIXct(tides$UTC_date_time)
+        }
     }
 
-    # Format tide table to use in interpolation:
-    #   every row is considered a tidal event (current event)
+    # Almost ready to interpolate!
+    # TODO: To handle custom tidal tables better I could use a
+    # smarter logic here, instead of just excluding the first row
+    # maybe exclude either first or last row based on delta t between events?
+    
+    # Format tide table:
+    #   every row is considered a tidal event (current event = event i)
     # remove first row to prevent issues with leading values
     tides_final <- tides[-1,]
-    # I add columns for start and end of current tidal event current:
-    #   date_time in original table is the end time (or peak) or current event
-    #   end time of last event is the start time of current event
+    # Add columns for start and end of current tidal event:
+    #   date_time is the end time (or peak) or current event
     tides_final$end <- as.POSIXct(tides_final$date_time)
+    #   end time of previous event is the start time of current event
     tides_final$start <- tides$date_time[-nrow(tides)]
-    # add column for durantion of event
+    # add column for duration of event
     tides_final$duration <- as.numeric(
         difftime( 
             tides_final$end,

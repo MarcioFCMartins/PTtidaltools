@@ -3,8 +3,9 @@
 #' Returns a data.frame with all tidal, for a time period with a specified start date and duration. The returned times are always in the local GMT time for the port (as specified in by the Portuguese National Hydrographic Institute).
 #' 
 #' @param port_id  The id code for the desired port. Use `port_list()` to see a list of IDs. Defaults to 19, which is Faro-Olhão.
-#' @param date  The starting date for the wanted tides. Format should be yyyy-mm-dd or yyyy/mm/dd. Accepts class character, Date and POSIXct. Defaults to current date.
-#' @param day_range The number of days for which to retrieve information. Defaults to 1 which only provides tides for `date`
+#' @param start_date  The starting date for the wanted tides. Format should be yyyy-mm-dd or yyyy/mm/dd. Accepts class character, Date and POSIXct. Defaults to current date.
+#' @param end_date The end date for the tidal table. Same format as start_date
+#' @param day_range OPTIONAL You can skip the end date and just say how many days you are interested in. Defaults to 1 which only provides tides for `start_date`
 #' @param include_moons Should lunar events be kept in the table? Defaults to FALSE.
 #' @param silent Should messages be suppressed? Defaults to FALSE (displays messages).
 #' 
@@ -15,27 +16,31 @@
 #' @export
 
 get_tides <- function(
-    port_id = 19,
-    date = Sys.Date(), 
-    day_range = 1,
+    port_id    = 19,
+    start_date = Sys.Date(),
+    end_date   = NULL,
+    day_range  = 1,
     include_moons = FALSE,
     silent = FALSE) {
     
-    
-    # the HTTP request requires the number of days after the provided date
-    day_range <- ifelse(
-        day_range < 0,
-        0,
-        day_range - 1
-    )
+    if(is.null(end_date)){
+        # the HTTP request requires the number of days after the provided date
+        day_range <- ifelse(
+            day_range < 0,
+            0,
+            day_range - 1
+        )
+    } else {
+        day_range <- as.Date(end_date) - as.Date(start_date)
+    }
     
     # the Hydrographic institute API only reports 2 timezones
     # when the query starts and ends on different timezones.
     # this is problematic for queries longer than 6 months
     # break large queries down into smaller ones
     if(day_range > 150){
-        start <- as.Date(date)
-        end   <- as.Date(date) + day_range
+        start <- as.Date(start_date)
+        end   <- as.Date(start_date) + day_range
         
         # sequence of dates to query
         query_dates <- seq.Date(
@@ -46,7 +51,7 @@ get_tides <- function(
         # ranges for queries
         query_ranges <- as.numeric(c(query_dates[-1], end) - query_dates)
     } else {
-        query_dates <- date
+        query_dates <- start_date
         query_ranges <- day_range
     }
     
@@ -88,11 +93,8 @@ get_tides <- function(
             table[, "time_delta"] <- as.numeric(time_zone)
             
             names(table) <- c("local_date_time", "height", "phenomenon", "time_delta")
-        }
-        
-        
-        # multiple time zones
-        if(n_cols == 4){
+        } else {
+            # multiple time zones
             time_zones <- rvest::html_text(query_page)
             time_zones <- regmatches(
                 time_zones, 
@@ -148,7 +150,6 @@ get_tides <- function(
                 " (", port_list()$port_name[port_list()$port_id == port_id],
                 ").")
         )
-        
         message("WARNING: due to sea level rise, observed water heights are\napproximately +10 cm over shown values.")
     }
     
