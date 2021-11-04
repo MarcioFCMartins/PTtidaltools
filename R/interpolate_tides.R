@@ -105,7 +105,7 @@ interpolate_tides <- function(
             all_days,
             function(x) get_tides(
                 port_id = port_id, 
-                date = x, 
+                start_date = x, 
                 day_range = 0, 
                 silent = TRUE)
         )
