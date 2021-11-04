@@ -191,7 +191,7 @@ interpolate_tides <- function(
    # about the query to the user
    get_tides(
        port_id = port_id,
-       date = all_days[1])
+       start_date = all_days[1])
     
     return(tidal_heights)
 }

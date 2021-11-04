@@ -4,7 +4,13 @@
 \alias{interpolate_tides}
 \title{Calculate estimated tide heights}
 \usage{
-interpolate_tides(date_times = NULL, port_id = 19, timezone = "local")
+interpolate_tides(
+  date_times = NULL,
+  port_id = 19,
+  tides = NULL,
+  timezone = "local",
+  digits = 2
+)
 }
 \arguments{
 \item{date_times}{A character vector with the format yyyy-mm-dd hh:mm:ss OR a POSIXct vector of date-time points for which tidal height will be estimated.}
@@ -12,16 +18,26 @@ interpolate_tides(date_times = NULL, port_id = 19, timezone = "local")
 \item{port_id}{The id code for the desired port (use port_list to see a list, Faro-Olhão is the default)}
 
 \item{timezone}{The timezone used for `date_times`. Must be one of "local" (which includes time changes due to daylight savings) or "UTC".}
+
+\item{tidal_table}{OPTIONAL A table with the tidal events and time at which they occur. If provided, the port_id will be ignored}
 }
 \description{
 This function interpolates tides at given time points for any port covered by 
-the National Hydrographic Institute.
+the National Hydrographic Institute, or for which a tidal table is provided.
 }
 \details{
-You must specify the port ID and provide the list of date-time points for which
-tidal height should be estimated.
+There are 2 main ways to use the function: 
+1) Provide a port ID and the function will query the National Hydrographic Institute
+for the required tidal tables. 
 
-It returns the expected tide height at those time-points, for that port
+2) Provide your own tidal table. Great if you want to save a table from
+`get_tides` and then run the code several times without constantly querying the API, 
+share it with other people or use the function without internet access.
+You can also use custom tidal tables, but in that case checking the integrity of
+the tidal table is mostly up to you.
+
+
+Returns the expected tide height at those time-points, for that port
 based on the method provided by the Portuguese National Hydrographic Institute.
 }
 \examples{

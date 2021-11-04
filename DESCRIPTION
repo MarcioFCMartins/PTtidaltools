@@ -11,7 +11,7 @@ Description: This package contains biddings to the Portuguese National Hydrograp
 License: Creative Commons Zero v1.0 Universal
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Imports: 
     rvest,
     xml2,
