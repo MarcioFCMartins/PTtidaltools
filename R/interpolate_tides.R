@@ -54,7 +54,7 @@ interpolate_tides <- function(
     }
     
     # Get list of unique days for which tidal table is required
-    days <- as.POSIXct(
+    days <- as.Date(
         unique(format(date_times, "%Y-%m-%d"))
     )
 
@@ -126,9 +126,9 @@ interpolate_tides <- function(
     # maybe exclude either first or last row based on delta t between events?
     
     # Format tide table:
-    #   every row is considered a tidal event (current event = event i)
+    # every row is considered a tidal event (current event = event i)
     # remove first row to prevent issues with leading values
-    tides_final <- tides[-1,]
+    tides_final <- tides[-1, ]
     # Add columns for start and end of current tidal event:
     #   date_time is the end time (or peak) or current event
     tides_final$end <- as.POSIXct(tides_final$date_time)
@@ -161,7 +161,7 @@ interpolate_tides <- function(
             parameters <- data.frame("last_event" = "low",
                                      "H" = next_event$height,
                                      "h" = previous_event$height,
-                                     "T1" = next_event$duration,
+                                     "T1" = previous_event$duration,
                                      "t" = as.numeric(
                                          sample_time - previous_event$end,
                                          "hours"))
@@ -169,7 +169,7 @@ interpolate_tides <- function(
             parameters <- data.frame("last_event" = "high",
                                      "H" = previous_event$height,
                                      "h" = next_event$height,
-                                     "T1" = next_event$duration,
+                                     "T1" = previous_event$duration,
                                      "t" = as.numeric(
                                          sample_time - previous_event$end,
                                          "hours"))
