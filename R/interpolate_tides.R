@@ -63,9 +63,9 @@ interpolate_tides <- function(
     all_days <- NULL
     for(i in 1:length(days)){
         current_day <- days[i]
-        interval <- c(current_day - 86400,
+        interval <- c(current_day - 1,
                       current_day,
-                      current_day + 86400)
+                      current_day + 1)
         
         if(is.null(all_days)){
             all_days <- interval
