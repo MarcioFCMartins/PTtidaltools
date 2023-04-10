@@ -150,7 +150,8 @@ get_tides <- function(
                 " (", port_list()$port_name[port_list()$port_id == port_id],
                 ").")
         )
-        message("WARNING: due to sea level rise, observed water heights are\napproximately +10 cm over shown values.")
+        message("WARNING: due to sea level rise, observed water heights are\n
+                approximately +10 cm over shown values.")
     }
     
     return(final_table)
