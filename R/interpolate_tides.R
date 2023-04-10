@@ -87,7 +87,7 @@ interpolate_tides <- function(
         }
         
         # check for presence of required days in tidal table
-        days_in_table <- as.POSIXct(unique(format(tides$date_time, "%Y-%m-%d")))
+        days_in_table <- as.Date(unique(format(tides$date_time, "%Y-%m-%d")))
         
         # stop if days are missing
         if(!all(all_days %in% days_in_table)){
