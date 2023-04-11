@@ -74,8 +74,11 @@ interpolate_tides <- function(
         }
     }
     
-    # remove duplicate days
+    # remove duplicate days and order them by date
     all_days <- unique(all_days)
+    all_days <- all_days[order(all_days)]
+    # Optimize queries to send to the IH API
+    query_intervals <- PTtidaltools:::optimize_queries(all_days)
     
     # if tidal table is provided
     if(!is.null(tides)){
@@ -100,13 +103,13 @@ interpolate_tides <- function(
         }
     # If a tidal table is NOT provided
     } else {
-        # get tidal data from NIH for all days needed for interpolation
+        # get tidal data from IH for all days needed for interpolation
         tides <- lapply(
-            all_days,
+            query_intervals,
             function(x) get_tides(
                 port_id = port_id, 
-                start_date = x, 
-                day_range = 0, 
+                start_date = x[1], 
+                end_date = x[2], 
                 silent = TRUE)
         )
         
