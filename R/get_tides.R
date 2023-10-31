@@ -16,31 +16,55 @@
 #' @export
 
 get_tides <- function(
-    port_id    = 19,
-    start_date = Sys.Date(),
-    end_date   = NULL,
-    day_range  = 1,
-    include_moons = FALSE,
-    silent = FALSE) {
+        port_id    = 19,
+        start_date = Sys.Date(),
+        end_date   = NULL,
+        day_range  = 1,
+        include_moons = FALSE,
+        silent = FALSE) {
     
+    # Convert start date to `Date` class
+    start_date <- eval(start_date)
+    start_date <- tryCatch(
+        as.Date(start_date),
+        error = function(e) {
+            message("Could not convert start_date to a Date object.\nTry converting it to a date yourself (see as.Date).")
+        })
+    stopifnot(
+        "Issue with the start_date.\n Please make sure this date exists." = !is.na(start_date)
+    )
+    
+    
+    # Calculate day_range needed for query
     if(is.null(end_date)){
         # the HTTP request requires the number of days after the provided date
         day_range <- ifelse(
-            day_range < 0,
+            day_range <= 0,
             0,
             day_range - 1
         )
     } else {
-        day_range <- as.Date(end_date) - as.Date(start_date)
+        end_date <- eval(end_date)
+        end_date   <- tryCatch(
+            as.Date(end_date),
+            error = function(e) {
+                message("Could not convert start_date to a Date object.\nTry converting it to a date yourself (see as.Date).")
+                stop()
+            })   
+        stopifnot(
+            "Issue with the start_date.\n Please make sure this date exists." = !is.na(end_date)
+        )
+        
+        day_range <- end_date - start_date
     }
     
-    # the Hydrographic institute API only reports 2 timezones
+    # the Hydrographic institute API only reports timezones information
     # when the query starts and ends on different timezones.
-    # this is problematic for queries longer than 6 months
-    # break large queries down into smaller ones
-    if(day_range > 150){
-        start <- as.Date(start_date)
-        end   <- as.Date(start_date) + day_range
+    # this is problematic for queries longer than 6 months, so they
+    # must be broken into shorter ones to get TZ info
+    if(day_range > 150){  # limit range of queries to 150 days
+        start <- start_date
+        end   <- start_date + day_range
         
         # sequence of dates to query
         query_dates <- seq.Date(
@@ -59,7 +83,7 @@ get_tides <- function(
     # Format date for query: yyyymmdd
     query_dates <- gsub("-|/", "",as.character(query_dates))
     
- 
+    
     # Build strings that link to the desired query
     query_links <- paste0(
         "https://www.hidrografico.pt/json/mare.port.val.php?po=",
@@ -130,7 +154,7 @@ get_tides <- function(
             format = "%Y-%m-%d %H:%M:%S"
         )
         
-       
+        
         table$UTC_date_time <- table$local_date_time - (3600 * table$time_delta)
         
         table <- table[, c("local_date_time", "UTC_date_time", "height", "phenomenon", "time_delta")]
