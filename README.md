@@ -1,4 +1,4 @@
-Tidaltools R package
+PTtidaltools R package
 ================
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4562490.svg)](https://doi.org/10.5281/zenodo.4562490)
